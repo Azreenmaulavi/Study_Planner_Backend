@@ -14,7 +14,7 @@ const {
 const upload = require('../middleware/multerConfig');  
 
 const { verifyToken } = require("../middleware/verifyToken");
-const { fetchUser } = require("../Middleware/fetchUser");
+const { fetchUser } = require("../middleware/fetchUser");
 
 
 /************************ Auth Routes ************************/
