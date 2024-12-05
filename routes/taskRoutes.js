@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { fetchUser } = require("../Middleware/fetchUser");
+const { fetchUser } = require("../middleware/fetchUser");
 const {
   addTask,
   updateTask,
