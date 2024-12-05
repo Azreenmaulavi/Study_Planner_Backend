@@ -15,7 +15,19 @@ dotenv.config();
 
 //Object
 const app = express();
-app.use(cors());
+// CORS configuration
+const corsOptions = {
+  origin: [
+    "http://localhost:3000", // Frontend in development
+    "https://study-planner-frontend.vercel.app/", // Replace with your live frontend domain
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // Allow cookies/auth tokens
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight requests globally
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
  
@@ -50,6 +62,17 @@ app.use("/api", progressRoute);
 app.use("/", (req, res) => {
   res.send("Hello");
 });
+// Handle invalid routes
+app.use((req, res, next) => {
+  res.status(404).json({ message: "Route not found" });
+});
+
+// Error handler middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "An internal server error occurred" });
+});
+
 
 //listen server
 app.listen(PORT, () => {
