@@ -19,15 +19,17 @@ const app = express();
 const corsOptions = {
   origin: [
     "http://localhost:3000", // Frontend in development
-    // "https://study-planner-frontend.vercel.app/", // Replace with your live frontend domain
-    "https://study-planner-frontend-lsg7ee2sr-practcie.vercel.app/"
+    "https://study-planner-frontend-lsg7ee2sr-practcie.vercel.app" // Frontend in production
   ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true, // Allow cookies/auth tokens
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow these HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
+  credentials: true, // Allow cookies/auth tokens to be included in requests
 };
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight requests globally
+console.log("Origins",origin)
+
+// Use CORS middleware
+app.use(cors(corsOptions)); // Apply CORS options
+app.options("*", cors(corsOptions)); // Handle preflight OPTIONS requests globally
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
