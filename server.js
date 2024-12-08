@@ -19,7 +19,7 @@ const app = express();
 const corsOptions = {
   origin: [
     "http://localhost:3000", // Frontend in development
-    "https://study-planner-frontend.vercel.app/", // Replace with your live frontend domain
+    // "https://study-planner-frontend.vercel.app/", // Replace with your live frontend domain
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
