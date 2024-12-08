@@ -25,7 +25,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
   credentials: true, // Allow cookies/auth tokens to be included in requests
 };
-console.log("Origins",origin)
+console.log("Origins",corsOptions)
 
 // Use CORS middleware
 app.use(cors(corsOptions)); // Apply CORS options
