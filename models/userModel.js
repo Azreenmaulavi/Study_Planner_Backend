@@ -21,7 +21,12 @@ const UserSchema = new Schema(
       default: null,
     },
     otp: { type: String, default: null },
+    totalStudyTime: { 
+      type: Number, 
+      default: 0 
+    }
   },
+  
 
   {
     timestamps: true,

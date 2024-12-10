@@ -175,3 +175,36 @@ exports.getUserProfile = async (req, res) => {
     return res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
+
+// Server-side controller
+exports.updateStudyTime = async (req, res) => {
+  const { userId } = req.params;
+  const { timeSpent } = req.body;
+
+  try {
+    // Update total study time for the user in the database
+    const user = await User.findById(userId);
+    user.totalStudyTime += timeSpent;
+    await user.save();
+
+    res.json({ totalStudyTime: user.totalStudyTime });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update study time" });
+  }
+};
+ exports.getStudyTime = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find the user by ID and return only the totalStudyTime field
+    const user = await User.findById(userId, 'totalStudyTime');
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ totalStudyTime: user.totalStudyTime });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch study time" });
+  }
+};
