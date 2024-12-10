@@ -20,7 +20,7 @@ const corsOptions = {
   origin: [
     "http://localhost:3000", // Frontend in development
     // "https://study-planner-frontend-lsg7ee2sr-practcie.vercel.app" // Frontend in production
-    "https://study-planner-frontend.vercel.app/"
+    "https://study-planner-frontend.vercel.app"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow these HTTP methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
