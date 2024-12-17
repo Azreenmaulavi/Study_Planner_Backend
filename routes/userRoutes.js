@@ -30,7 +30,8 @@ router.post("/generate-otp", otpGenerate);
 router.post("/verify-otp", verifyOTP); 
 router.get("/user/getUserProfile/:userId",verifyToken,fetchUser, getUserProfile); 
 // Route to upload profile picture
-router.post('/user/uploadProfilePicture/:userId', upload.single('profilePicture'),verifyToken,fetchUser, updateUser);
+// router.post('/user/uploadProfilePicture/:userId', upload.single('profilePicture'),verifyToken,fetchUser, updateUser);
+router.post('/user/uploadProfilePicture/:userId',upload.single('profilePicture'),verifyToken,fetchUser, updateUser);
 router.post('/updateStudyTime/:userId',verifyToken,fetchUser, updateStudyTime);
 router.get('/studyTime/:userId',verifyToken,fetchUser, getStudyTime);
 

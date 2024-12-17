@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
+const cloudinary = require('../config/cloudinary');
 const path = require('path');
 const otpGenerator = require("otp-generator");
 const {sendOtp } = require("./mailController");
@@ -118,54 +119,133 @@ exports.resetPassword = async (req, res) => {
   };
 
 
-  
+
+
   // Update Profile Picture and Email
-  exports.updateUser = async (req, res) => {
-    const userId = req.params.userId; // Get user ID from URL parameters
+  // exports.updateUser = async (req, res) => {
+  //   const userId = req.params.userId; // Get user ID from URL parameters
   
+  //   try {
+  //     const user = await User.findById(userId);
+  //     if (!user) {
+  //       return res.status(404).json({ error: 'User not found' });
+  //     }
+  
+  //     // Update fields if provided
+  //     if (req.file) {
+  //       const profilePicturePath = path.join('uploads', req.file.filename);
+  //       user.profilePicture = profilePicturePath;
+  //     }
+  
+  //     if (req.body.email) {
+  //       user.email = req.body.email;
+  //     }
+  
+  //     await user.save();
+  
+  //     return res.status(200).json({
+  //       success: true,
+  //       message: 'Profile picture and email updated successfully',
+  //       profilePicture: user.profilePicture,
+  //       email: user.email,
+  //     });
+  //   } catch (error) {
+  //     console.error('Error updating profile picture and email:', error);
+  //     return res.status(500).json({ error: 'An error occurred while updating the profile picture and email' });
+  //   }
+  // };
+  exports.updateUser = async (req, res) => {
     try {
+      const userId = req.params.userId;
+      console.log("UserId:", userId);
+      
       const user = await User.findById(userId);
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ message: "User not found!" });
       }
+      console.log("Req.file:", req.file);  // Log the uploaded file
   
-      // Update fields if provided
       if (req.file) {
-        const profilePicturePath = path.join('uploads', req.file.filename);
-        user.profilePicture = profilePicturePath;
+        try {
+          // Upload image to Cloudinary using the buffer
+          const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: 'user_profiles',
+                public_id: `profile_${user._id}`,
+                resource_type: 'image',
+              },
+              (error, result) => {
+                if (error) {
+                  reject(error);
+                } else {
+                  resolve(result);
+                }
+              }
+            );
+            
+            // Pipe the file buffer to Cloudinary
+            uploadStream.end(req.file.buffer);  // Use the buffer directly
+          });
+  
+          console.log('Cloudinary Upload Result:', result);
+  
+          // Set the profile picture URL returned by Cloudinary
+          user.profilePicture = result.secure_url;
+          console.log("Updated Profile Pic URL:", user.profilePicture);
+        } catch (cloudinaryError) {
+          console.error('Cloudinary Error:', cloudinaryError);
+          res.status(400).json({ message: "File size exceeds the limit" });
+        }
       }
   
-      if (req.body.email) {
-        user.email = req.body.email;
-      }
+      // Update user email or keep the existing one
+      user.email = req.body.email || user.email;
   
+      // Save the updated user (including the profile picture)
       await user.save();
+      console.log('User after save:', user);
   
-      return res.status(200).json({
-        success: true,
-        message: 'Profile picture and email updated successfully',
-        profilePicture: user.profilePicture,
-        email: user.email,
-      });
+      res.status(200).json({ message: "Profile updated successfully", user });
     } catch (error) {
-      console.error('Error updating profile picture and email:', error);
-      return res.status(500).json({ error: 'An error occurred while updating the profile picture and email' });
+      console.error('Server Error:', error);
+      res.status(500).json({ message: "Server error" });
     }
   };
   
-  // Get User Profile
+//   // Get User Profile
+// exports.getUserProfile = async (req, res) => {
+//   const userId = req.params.userId; // Get userId from URL parameter
+
+//   try {
+//     // Find user by userId
+//     const user = await User.findById(userId).select('name email profilePicture'); // Only select relevant fields
+
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     // Return user profile data including profile picture URL
+//     return res.status(200).json({
+//       message: 'User profile retrieved successfully',
+//       data: user,
+//     });
+//   } catch (error) {
+//     console.error('Error retrieving user profile:', error);
+//     return res.status(500).json({ message: 'Server Error', error: error.message });
+//   }
+// };
+// Get User Profile
 exports.getUserProfile = async (req, res) => {
-  const userId = req.params.userId; // Get userId from URL parameter
+  const userId = req.params.userId;
 
   try {
-    // Find user by userId
-    const user = await User.findById(userId).select('name email profilePicture'); // Only select relevant fields
+    const user = await User.findById(userId).select('name email profilePicture');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Return user profile data including profile picture URL
     return res.status(200).json({
       message: 'User profile retrieved successfully',
       data: user,
@@ -175,6 +255,7 @@ exports.getUserProfile = async (req, res) => {
     return res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
+
 
 // Server-side controller
 exports.updateStudyTime = async (req, res) => {
